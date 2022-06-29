@@ -207,42 +207,22 @@ services:
     depends_on:
       es01:
         condition: service_healthy
-      # es02:
-      #   condition: service_healthy
-      # es03:
-      #   condition: service_healthy
-    # image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
-    build:
-      context: ./kibana
-      args:
-        - STACK_VERSION=${STACK_VERSION}
+      es02:
+        condition: service_healthy
+      es03:
+        condition: service_healthy
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     volumes:
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
-      # - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
       - "${KIBANA_PORT}:5601"
     environment:
-      # - SERVERNAME=kibana
-      - SERVERNAME=localhost
-      - ELASTICSEARCH_URL=${LOGSTASH_ELASTICSEARCH_HOST}
-      - ELASTICSEARCH_HOSTS=${LOGSTASH_ELASTICSEARCH_HOST}
-      - ELASTICSEARCH_USERNAME=${KIBANA_USERNAME}
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=https://es01:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-      - xpack.fleet.agents.enabled=false
-      - xpack.fleet.enabled=false
-      - xpack.reporting.roles.enabled=true
-      - XPACK_SECURITY_ENABLED=true
-      # - XPACK_INGESTMANAGER_FLEET_TLSCHECKDISABLED=true
-      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${KIBANA_ENCRYPTION_KEY}
-      # - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=$CERTS_DIR/ca/ca.crt
       - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
-      - SERVER_SSL_ENABLED=true
-      - SERVER_SSL_KEY=config/certs/kibana/kibana.key
-      - SERVER_SSL_CERTIFICATE=config/certs/kibana/kibana.crt
-      # - xpack.encryptedSavedObjects.encryptionKey=24e95edfab001e639a80b1fd0959da89
-      # - xpack.reporting.encryptionKey=85005ab365c1fa2e945a80e61dc5e243
-      # - xpack.security.encryptionKey=95c0aec43ddfadc310e0594e9b8adb71
     mem_limit: ${MEM_LIMIT}
     healthcheck:
       test:
@@ -265,7 +245,7 @@ services:
         - STACK_VERSION=${STACK_VERSION}
     volumes:
       - certs:/usr/share/logstash/config/certs
-      # - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
       # - ./logstash/config:/usr/share/logstash/config
     ports:
       - 9600:9600
@@ -273,7 +253,7 @@ services:
     environment:
       - LOGSTASH_USERNAME=${LOGSTASH_USERNAME}
       - LOGSTASH_PASSWORD=${LOGSTASH_PASSWORD}
-      - LOGSTASH_JDBC_URL=${LOGSTASH_ELASTICSEARCH_HOST}
+      - LOGSTASH_JDBC_URL=${LOGSTASH_JDBC_URL}
       - LOGSTASH_JDBC_DRIVER_CLASS=${LOGSTASH_JDBC_DRIVER_CLASS}
       # - LOGSTASH_JDBC_DRIVER_JAR_LOCATION=${LOGSTASH_JDBC_DRIVER_JAR_LOCATION}
       - LOGSTASH_JDBC_DRIVER_LIBRARY=${LOGSTASH_JDBC_DRIVER_LIBRARY}
@@ -317,7 +297,6 @@ services:
     # network_mode: service:app
     ports:
       - 3306:3306
-    hostname: db.icv
     # networks:
     #   icv_net:
     #     aliases:
@@ -336,4 +315,3 @@ volumes:
     driver: local
   mysql-data:
     driver: local
-

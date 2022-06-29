@@ -18,6 +18,7 @@ RUN /usr/share/logstash/bin/logstash-plugin install logstash-filter-mutate
 # COPY ./mysql-connector-java-8.0.11.jar /usr/share/logstash/logstash-core/lib/jars/mysql-connector-java.jar
 COPY ./jars/ /usr/share/logstash/logstash-core/lib/jars/
 COPY ./jars/ /usr/share/logstash/jars/
+COPY ./pipeline/logstash.conf /usr/share/logstash/pipeline/
 
 
 # COPY ./compose/sql-server/mssql-jdbc-7.4.1.jre11.jar /usr/share/logstash/logstash-core/lib/jars/mssql-jdbc.jar
